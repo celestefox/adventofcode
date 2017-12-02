@@ -1,5 +1,6 @@
 (ns day2.core
-  (:gen-class))
+  (:gen-class)
+  (:require [clojure.math.combinatorics :as combo]))
 
 (defn parseint
   [i]
@@ -13,18 +14,25 @@
        (map clojure.string/trim)
        (map #(clojure.string/split % #"\p{Space}"))
        (map #(map clojure.string/trim %))
-       (map #(map parseint %))
-       ))
+       (map #(map parseint %))))
 
 (defn checksum-difference
-     [ls]
-     (- (apply max ls) (apply min ls)))
+  [ls]
+  (- (apply max ls) (apply min ls)))
+
+(defn checksum-divisible
+  [ls]
+  (->> (combo/cartesian-product ls ls)
+       (map #(if (and (zero? (rem (first %) (second %))) (not= (first %) (second %))) (/ (first %) (second %)) nil))
+       (remove nil?)
+       distinct
+       first))
 
 (defn checksum
   "Calculates the \"Checksum\" of the input."
-  [spreadsheet]
+  [spreadsheet meth]
   (reduce + (map
-             checksum-difference
+             meth
              spreadsheet)))
 
 (defn -main
@@ -32,4 +40,5 @@
   [& args]
   (let [file (if args (first args) "input")]
     (let [contents (slurp file)]
-      (println (checksum (parseinput contents))))))
+      (println (checksum (parseinput contents) checksum-difference))
+      (println (checksum (parseinput contents) checksum-divisible)))))
