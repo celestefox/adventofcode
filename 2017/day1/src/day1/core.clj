@@ -7,13 +7,12 @@
   (partition (count colls) (apply interleave colls)))
 
 (defn matchsum
-  "Finds the sum of all digits that match the next digit in a string.
-  (It \"wraps\" around, so that the last digit must match the first to be added)"
-  [x]
+  "Finds the sum of all digits that match the digit distance away, wrapping around."
+  [x distance]
   (->> x
        seq
        (map (fn [^Character c] (Character/digit c 10)))
-       ((fn [y] (zip y (next (cycle y)))))
+       ((fn [y] (zip y (nthnext (cycle y) distance))))
        (map (fn [v] (if (= (first v) (second v)) (first v) 0)))
        ;; Add things that do the logic here
        (reduce +)))
@@ -22,4 +21,6 @@
   "Lets you run matchsum from the command line."
   [& args]
   (let [file (if args (first args) "input")]
-    (println (matchsum (clojure.string/trim (slurp file))))))
+    (let [contents (clojure.string/trim (slurp file))]
+      (println (matchsum contents 1))
+      (println (matchsum contents (/ (count contents) 2))))))
