@@ -45,14 +45,28 @@ The sides of the square of n are... n. And you start in an obvious place. Hmm.
 
 each corner has a "index", "cindex", and "number", as I'm calling them. Everything has an "index" and "number". The "number" is what the problem gives - the number written on a cell. the "index" is the distance to it - what we are trying to solve. These corners are special because there is a number, "cindex", such that cindex-1 is index and cindex^2 is number. These are the squares of odd numbers - the center is cindex 1, the first bottom right corner is cindex 3, the next is 5, etc.
 
-We are trying to find the index of some number, which I will call `n`. First, we find the cindex of the "closest" (highest number that is still less than `n`) corner. To do this, `floor(sqrt(i))`, and `dec` if `even?`. Call this `ci`.
+We are trying to find the index of some number, which I will call `n`. First, we find the cindex of the "closest" (highest number that is still less than `n`) corner. To do this, `floor(sqrt(n-1))`, and `dec` if `even?`. Call this `ci`. Why `n-1`? Otherwise, the corners theirselves don't work right. It... feels like a quick hack, but it works fine and only affects the corner case.
 
 Next, we want the "distance" around the spiral from that corner. We will find that with `n-ci^2` and call that `dist`.
 
 Then, we want the "side position" of `n` - "where" it is on the side. This is `pos` = `(mod dist (inc ci))`. This is because the corner is the last number of each square. Corner cindex 3 continues on at 10 to the left one more, then spiraling around more, etc. The sides of the square our corner is on are `ci-1`, but the sides of the next are `ci+2-1`. (I'm specifically talking about how I add that many squares to get to what is the next corner here. In the next part I'm talking about the total dimension, one more).
 
-So. We know we are position `pos` on the side of the square with sides `ci+2` overall. That is 0 indexed because mod. The center of each side is `(ci+1)/2` index. Add `abs(pos-(ci+1)/2)` to that, because that's how much further we are from the center. 
+So. We know we are position `pos` on the side of the square with sides `ci+2` overall. That is 0 indexed because mod. The center of each side is `(ci+1)/2` index. Add `abs(pos-(ci+1)/2)` to that, because that's how much further we are from the center.
 
 A concrete example. `n=20`. `ci=3`. `dist=11`. `side=2`. `pos=3`. `(ci+1)/2=2`. `abs(pos-prev)=1`. And checking with the table above, `2+1`, our answer, is indeed right!
+
+# Part 2
+
+Okay. So, first I want to write it out here.
+
+147  142  133  122   59
+304    5    4    2   57
+330   10    1    1   54
+351   11   23   25   26
+362  747  806--->   ...
+
+1 1 2 4 5 10 11 23 25 26 54 57 59 122 133 142 147 304 330 351 362 747 805 ...
+
+So, getting the first one that is more than a number is easy `(drop-while (partial > number) seq)`. The problem is producing the sequence.
 
 
