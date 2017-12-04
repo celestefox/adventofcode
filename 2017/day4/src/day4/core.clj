@@ -12,6 +12,12 @@
   (let [splitPassphrase (seq (splitWhitespace passphrase))]
     (= splitPassphrase (distinct splitPassphrase))))
 
+(defn anagramPassphrase?
+  "Checks if the passphrase has no unique/anagram words."
+  [passphrase]
+  (let [sortedPassphrase (map sort (seq (splitWhitespace passphrase)))]
+    (= sortedPassphrase (distinct sortedPassphrase))))
+
 (defn trueToNum
   "Translates true to 1 and false to 0."
   [maybeTrue]
@@ -19,11 +25,11 @@
 
 (defn validPassphrases
   "Returns how many passphrases of sequence are valid."
-  [sequence]
+  [sequence checkfn]
   (->> sequence
        (clojure.string/split-lines)
        (map clojure.string/trim)
-       (map passphrase?)
+       (map checkfn)
        (map trueToNum)
        (reduce +)))
 
@@ -32,4 +38,5 @@
   [& args]
   (let [filename (if args (first args) "input")]
     (let [contents (clojure.string/trim (slurp filename))]
-      (println (validPassphrases contents)))))
+      (println (validPassphrases contents passphrase?))
+      (println (validPassphrases contents anagramPassphrase?)))))
